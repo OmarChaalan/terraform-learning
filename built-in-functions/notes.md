@@ -51,7 +51,7 @@
 - IMPORTANT: once encoded, the result is a STRING — cannot run map functions like
   merge() on it anymore. Do all merging in HCL first, encode LAST.
 
-## The One Fixed Pattern (not a 6th function to master)
+## The One Fixed Pattern 
 base64encode(templatefile(...))
 - AWS requires EC2 user data specifically in base64 format — an AWS API rule, not optional
 - Always appears as this exact combo when building EC2 user data
