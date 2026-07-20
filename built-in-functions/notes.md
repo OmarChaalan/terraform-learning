@@ -5,8 +5,6 @@
 - Functions are how you transform, combine, and format data instead
 - Each function exists to solve one specific real problem — not learned for their own sake
 
-## The 5 I Actually Need to Know Deeply
-
 ### merge()
 - Combines two or more maps into one
 - If a key exists in both maps, the LATER map wins
@@ -78,8 +76,6 @@ terraform console
 exit
 
 ## My Mistakes / Things to Remember
-- Functions are NOT variables — a variable holds a value I provide,
-  a function transforms/computes a value
 - for_each creates a MAP of resources, not a single resource —
   to read outputs from it I need a for expression:
   [for key, val in aws_s3_bucket.purpose_buckets : val.id]
