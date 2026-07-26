@@ -3,11 +3,11 @@ output "vpc_id" {
 }
 
 output "public_subnet_ids" {
-    value = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
+    value = [for s in aws_subnet.public_subnet : s.id]
 }
 
 output "private_subnet_ids" {
-    value = [aws_subnet.private_subnet_1.id, aws_subnet.private_subnet_2.id]
+    value = [for s in aws_subnet.private_subnet : s.id]
 }
 
 output "vpc_cidr" {

@@ -16,47 +16,27 @@ resource "aws_internet_gateway" "main_igw" {
     })
 }
 
-resource "aws_subnet" "public_subnet_1" {
+resource "aws_subnet" "public_subnet" {
+    for_each = toset(var.availability_zones)
     vpc_id = aws_vpc.main.id
-    cidr_block = var.public_subnet_cidrs[0]
-    availability_zone = var.availability_zones[0]
+    cidr_block = var.public_subnet_cidrs[index(var.availability_zones, each.value)]
+    availability_zone = each.value
     map_public_ip_on_launch = true
 
     tags = merge(var.common_tags, {
-        Name = "${var.environment}-public-subnet-1"
+        Name = "${var.environment}-public-subnet-${each.value}"
     })
 }
 
-resource "aws_subnet" "public_subnet_2" {
+resource "aws_subnet" "private_subnet" {
+    for_each = toset(var.availability_zones)
     vpc_id = aws_vpc.main.id
-    cidr_block = var.public_subnet_cidrs[1]
-    availability_zone = var.availability_zones[1]
-    map_public_ip_on_launch = true
-
-    tags = merge(var.common_tags, {
-        Name = "${var.environment}-public-subnet-2"
-    })
-}
-
-resource "aws_subnet" "private_subnet_1" {
-    vpc_id = aws_vpc.main.id
-    cidr_block = var.private_subnet_cidrs[0]
-    availability_zone = var.availability_zones[0]
+    cidr_block = var.private_subnet_cidrs[index(var.availability_zones, each.value)]
+    availability_zone = each.value
     map_public_ip_on_launch = false
 
     tags = merge(var.common_tags, {
-        Name = "${var.environment}-private-subnet-1"
-    })
-}
-
-resource "aws_subnet" "private_subnet_2" {
-    vpc_id = aws_vpc.main.id
-    cidr_block = var.private_subnet_cidrs[1]
-    availability_zone = var.availability_zones[1]
-    map_public_ip_on_launch = false
-
-    tags = merge(var.common_tags, {
-        Name = "${var.environment}-private-subnet-2"
+        Name = "${var.environment}-private-subnet-${each.value}"
     })
 }
 
@@ -73,13 +53,10 @@ resource "aws_route_table" "public_rt" {
     })
 }
 
-resource "aws_route_table_association" "public_rt_association_1" {
-    subnet_id = aws_subnet.public_subnet_1.id
-    route_table_id = aws_route_table.public_rt.id
-}
+resource "aws_route_table_association" "public_rt_association" {
+    for_each = aws_subnet.public_subnet
 
-resource "aws_route_table_association" "public_rt_association_2" {
-    subnet_id = aws_subnet.public_subnet_2.id
+    subnet_id = each.value.id
     route_table_id = aws_route_table.public_rt.id
 }
 
@@ -93,7 +70,7 @@ resource "aws_eip" "nat_eip" {
 
 resource "aws_nat_gateway" "main_ngw" {
     allocation_id = aws_eip.nat_eip.id
-    subnet_id = aws_subnet.public_subnet_1.id
+    subnet_id = aws_subnet.public_subnet[var.availability_zones[0]].id
 
     tags = merge(var.common_tags, {
         Name = "${var.environment}-main-ngw"
@@ -115,43 +92,29 @@ resource "aws_route_table" "private_rt" {
     })
 }
 
-resource "aws_route_table_association" "private_rt_association_1" {
-    subnet_id = aws_subnet.private_subnet_1.id
+resource "aws_route_table_association" "private_rt_association" {
+    for_each = aws_subnet.private_subnet
+
+    subnet_id = each.value.id
     route_table_id = aws_route_table.private_rt.id
 }
 
-resource "aws_route_table_association" "private_rt_association_2" {
-    subnet_id = aws_subnet.private_subnet_2.id
-    route_table_id = aws_route_table.private_rt.id
-}
 
 resource "aws_security_group" "web_sg" {
     vpc_id = aws_vpc.main.id
     name = "${var.environment}-web-sg"
     description = "Allow HTTP, HTTPS, and SSH from my IP"
 
-    ingress {
-        description = "HTTP from anywhere"
-        from_port = 80
-        to_port = 80
-        protocol = "tcp"
-        cidr_blocks = [ "0.0.0.0/0" ]
-    }
+    dynamic "ingress" {
+        for_each = local.ingress_rules
 
-    ingress {
-        description = "HTTPS from anywhere"
-        from_port = 443
-        to_port = 443
-        protocol = "tcp"
-        cidr_blocks = [ "0.0.0.0/0" ]
-    }
-
-    ingress {
-        description = "SSH only from IP"
-        from_port = 22
-        to_port = 22
-        protocol = "tcp"
-        cidr_blocks = [ var.my_ip ]
+        content {
+            description = ingress.value.description
+            from_port = ingress.value.port
+            to_port = ingress.value.port
+            protocol = "tcp"
+            cidr_blocks = ingress.value.cidr_blocks
+        }
     }
 
     egress {
