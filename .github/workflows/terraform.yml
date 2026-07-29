@@ -1,0 +1,59 @@
+name: Terraform CI/CD
+
+on:
+  pull_request
+    branches: [main]
+  push_request
+    branches: [main]
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  terraform:
+  runs-on: ubuntu-latest
+
+  steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials via OIDC
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::389813258685:role/github-actions-terraform-role
+        aws-region: us-east-1
+    
+    - name: Setup Terraform
+      uses: hashicorp/set-terraform@v3
+
+    - name: Terraform Format Check
+      run: terraform fmt -check
+      working-directory: ./modules-practice
+
+    - name: Terraform Init
+      run: terraform init
+      working-directory: ./modules-practice
+
+    - name: Terraform Plan
+      id: plan
+      run: terraform plan -no-color
+      working-directory: ./modules-practice
+      continue-on-error: true
+
+    - name: Comment Plan on PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const output = `#### Terraform Plan
+          \`\`\`
+          ${{ steps.plan.outputs.stdout }}
+          \`\`\`
+          `;
+          github.rest.issues.createComment({ ... });
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: terraform apply -auto-approve
+      working-directory: ./modules-practice
