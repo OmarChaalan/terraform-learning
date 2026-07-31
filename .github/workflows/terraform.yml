@@ -41,6 +41,8 @@ jobs:
         run: terraform plan -no-color
         working-directory: ./modules-practice
         continue-on-error: true
+        env:
+          TF_VAR_my_ip: ${{ secrets.TF_VAR_MY_IP }}
 
       - name: Comment Plan on PR
         if: github.event_name == 'pull_request'
@@ -62,3 +64,5 @@ jobs:
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve
         working-directory: ./modules-practice
+        env:
+          TF_VAR_my_ip: ${{ secrets.TF_VAR_MY_IP }}
