@@ -1,4 +1,4 @@
-# Day 4 — Dependencies + Data Sources
+# Dependencies + Data Sources
 
 ## Implicit Dependencies
 - Created automatically when one resource references another's attribute

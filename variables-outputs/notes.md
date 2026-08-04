@@ -1,4 +1,4 @@
-# Day 3 — Variables, Outputs + Locals
+# Variables, Outputs + Locals
 
 ## Why Variables Exist
 - Variables remove hardcoded values from your code

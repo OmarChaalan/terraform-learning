@@ -1,4 +1,4 @@
-# Day 2 — Providers + State Management
+# Providers + State Management
 
 ## What is a Provider?
 - A provider is a plugin that lets Terraform talk to a specific platform (AWS, Azure, GCP)

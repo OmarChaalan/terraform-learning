@@ -1,4 +1,4 @@
-# Day 11 — GitHub Actions CI/CD (Went Deep, Not Lighter Bar)
+# GitHub Actions CI/CD (Went Deep, Not Lighter Bar)
 
 ## The Core Concept — CI/CD in Plain Terms
 - CI (Continuous Integration) = automatically CHECK a change is good before anyone uses it

@@ -1,4 +1,4 @@
-# Day 7 — Practice: Full Production VPC
+# Practice: Full Production VPC
 
 ## Goal
 Build a complete, production-style VPC from scratch using everything from Week 1 —

@@ -1,4 +1,4 @@
-# Day 10 — Security Best Practices
+# Security Best Practices
 
 ## Why This Matters
 - Bots scan public GitHub repos for exposed AWS keys within minutes of a push

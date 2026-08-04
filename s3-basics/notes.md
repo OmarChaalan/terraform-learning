@@ -1,4 +1,4 @@
-# Day 12 — S3 Basics in Terraform
+# S3 Basics in Terraform
 
 ## The Core Resource
 resource "aws_s3_bucket" "example" {

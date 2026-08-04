@@ -1,4 +1,4 @@
-# Day 5 — Built-in Functions
+# Built-in Functions
 
 ## Why Functions Exist
 - Terraform has no if/else or general loops like a real programming language
